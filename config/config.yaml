@@ -1,0 +1,21 @@
+max_retry: 2
+memory_enabled: false
+timeout_s: 120
+hitl:
+  enabled: false
+
+# KB chunking
+chunk_size: 512
+chunk_overlap: 64
+max_input_chars: 1000000
+
+# Vector store
+collection_name: "default"
+
+# Pipeline flags
+enable_impact_assessment: true
+
+# Marketplace output and Azure OpenAI review
+output_format: "markdown"
+llm_temperature: 0.2
+llm_max_tokens: 1600

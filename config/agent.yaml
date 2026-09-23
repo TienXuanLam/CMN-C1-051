@@ -1,0 +1,40 @@
+# Agent Manifest — AgentRegistry entry point
+# AgentRegistry (mediator/registry/agent_registry.py) reads every key below at
+# ROOT level — do NOT nest keys under an `agent:` block. That nested shape is
+# invisible to the registry (falls back to defaults / KeyErrors).
+id: "CMN-C1-051"
+name: "cmn-c1-051"
+namespace: "cmn"
+version: "1.1.0"
+enabled: true
+category: "Cat 1"
+# Hash-based delta calculation remains deterministic; Azure OpenAI explains
+# the impact and recommended update actions from sanitized metadata.
+generation_mode: "llm"
+industry: "CMN"
+
+# Opaque compatibility metadata.
+base_type: "fixed-pipeline"
+
+# Entry point — single dotted import path (module.Class), NOT split module:/class:.
+# AgentRegistry does `manifest["class"].rsplit(".", 1)` to get (module, class_name).
+class: "src.graph.graph.KBUpdateGraph"
+description: "Incremental Knowledge Base Update Planner — accepts a plain-text JSON/YAML document event, computes chunk deltas, and returns an Azure OpenAI-assisted Markdown impact report."
+
+# Marketplace users are authenticated as verified external callers. The agent
+# produces an update plan; it does not expose direct vector-store write access.
+required_trust_level: "VERIFIED_EXTERNAL"
+
+# Compile-time gates (AgentRegistry._compile_and_cache) — declare every secret/extra
+# actually used, or the agent loads with those checks silently disabled.
+requires:
+  secrets:
+    - AZURE_OPENAI_API_KEY
+    - AZURE_OPENAI_ENDPOINT
+    - AZURE_OPENAI_DEPLOYMENT
+  extras: ["openai"]
+
+# generation_mode is deployment identity, not a tunable provider setting. Runtime parameters
+# (max_retry, timeout_s, hitl, memory_enabled, ...) live in
+# config/config.yaml — AgentRegistry loads that file separately and passes it
+# as Graph(config=...). Do NOT put them here.
